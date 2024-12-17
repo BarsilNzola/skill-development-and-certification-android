@@ -2,24 +2,16 @@ class User {
   final int id;
   final String username;
   final String email;
-  final String? password;
+  final String token;
 
-  User({required this.id, required this.username, required this.email, this.password});
+  User({required this.id, required this.username, required this.email, required this.token});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
       username: json['username'],
       email: json['email'],
-      password: json['password'],
+      token: json['token'],  // Adjust field names as per your API response
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'username': username,
-      'email': email,
-      'password': password,
-    };
   }
 }

@@ -17,7 +17,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Code Gears',
         theme: appTheme,
-        home: HomeScreen(),
         initialRoute: '/',
         routes: {
           '/': (context) => HomeScreen(),

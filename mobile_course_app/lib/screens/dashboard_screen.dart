@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_course_app/services/api_services.dart';
 import 'package:mobile_course_app/models/module.dart';
+import 'package:mobile_course_app/models/user.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -12,9 +13,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final ApiService _apiService = ApiService(baseUrl: 'http://localhost:8000/api');  // Adjust baseUrl to your backend URL
 
   @override
-  void initState() {
-    super.initState();
-    _modules = _apiService.fetchModules();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final User user = ModalRoute.of(context)!.settings.arguments as User;
+    _modules = _apiService.fetchUserModules(user.id);  // Fetch user-specific modules
   }
 
   @override

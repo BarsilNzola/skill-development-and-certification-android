@@ -16,17 +16,11 @@ class ApiService {
   ApiService({required this.baseUrl});
 
 
-  // Login User
-  Future<User> loginUser(String username, String password) async {
+  Future<User> login(String username, String password) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/auth/login/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'username': username,
-        'password': password,
-      }),
+      Uri.parse('$baseUrl/login/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'username': username, 'password': password}),
     );
 
     if (response.statusCode == 200) {
@@ -36,24 +30,17 @@ class ApiService {
     }
   }
 
-  // Signup User
-  Future<User> signupUser(String username, String email, String password) async {
+  Future<User> signup(String username, String email, String password) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/auth/signup/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'username': username,
-        'email': email,
-        'password': password,
-      }),
+      Uri.parse('$baseUrl/signup/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'username': username, 'email': email, 'password': password}),
     );
 
     if (response.statusCode == 201) {
       return User.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to signup');
+      throw Exception('Failed to sign up');
     }
   }
 
@@ -78,6 +65,17 @@ class ApiService {
       throw Exception('Failed to load modules');
     }
   }
+    
+  Future<List<Module>> fetchUserModules(int userId) async {
+    final response = await http.get(Uri.parse('$baseUrl/users/$userId/modules/'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(response.body);
+      return body.map((dynamic item) => Module.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load user modules');
+    }
+  }
 
   Future<List<Lesson>> fetchLessons() async {
     final response = await http.get(Uri.parse('$baseUrl/lessons/'));
@@ -100,7 +98,6 @@ class ApiService {
       throw Exception('Failed to load lessons for module');
     }
   }
-
 
   Future<Lesson> fetchLessonDetail(int lessonId) async {
     final response = await http.get(Uri.parse('$baseUrl/lessons/$lessonId/'));
