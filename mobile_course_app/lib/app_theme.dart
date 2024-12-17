@@ -11,8 +11,8 @@ final ThemeData appTheme = ThemeData(
     textTheme: ButtonTextTheme.primary,
   ),
   textTheme: const TextTheme(
-    headline5: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF333)), 
-    bodyText1: TextStyle(fontSize: 16, color: Color(0xFF555)), 
-    bodyText2: TextStyle(fontSize: 14, color: Color(0xFF666)),
+    headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF333)), 
+    bodyLarge: TextStyle(fontSize: 16, color: Color(0xFF555)), 
+    bodyMedium: TextStyle(fontSize: 14, color: Color(0xFF666)),
   ),
 );

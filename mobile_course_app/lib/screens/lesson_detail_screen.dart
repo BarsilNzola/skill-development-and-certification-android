@@ -1,66 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_course_app/services/api_services.dart';
+import 'package:mobile_course_app/models/lesson.dart';
 
-class LessonDetailScreen extends StatelessWidget {
+class LessonDetailScreen extends StatefulWidget {
+  @override
+  _LessonDetailScreenState createState() => _LessonDetailScreenState();
+}
+
+class _LessonDetailScreenState extends State<LessonDetailScreen> {
+  late Future<Lesson> _lesson;
+  final ApiService _apiService = ApiService(baseUrl: 'http://localhost:8000/api');  // Adjust baseUrl to your backend URL
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final lessonId = ModalRoute.of(context)!.settings.arguments as int;
+    _lesson = _apiService.fetchLessonDetail(lessonId);  // Update your API service accordingly
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Lesson Detail'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LinearProgressIndicator(
-                value: 0.5,  // Update this with actual progress
-                backgroundColor: Colors.grey[300],
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF004466)),
-              ),
-              SizedBox(height: 20),
-              Text('Lesson Title', style: TextStyle(fontSize: 24)),
-              Text('Week 1, Day 1', style: TextStyle(fontSize: 16, color: Colors.grey)),
-              SizedBox(height: 20),
-              Text(
-                'Lesson content goes here...',
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(height: 20),
-              if (true)  // Replace with condition to check if it's Day 5
-                Column(
-                  children: [
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: 'GitHub Repository Link',
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Handle assignment submission
-                      },
-                      child: Text('Submit'),
-                    ),
-                  ],
-                ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Handle marking lesson as completed
-                },
-                child: Text('Mark as Completed'),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Handle downloading certificate
-                },
-                child: Text('Download Certificate'),
-              ),
-            ],
-          ),
-        ),
+      body: FutureBuilder<Lesson>(
+        future: _lesson,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData) {
+            return Center(child: Text('No lesson details available'));
+          }
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(snapshot.data!.title, style: Theme.of(context).textTheme.headlineMedium),
+                SizedBox(height: 10),
+                Text('Week ${snapshot.data!.week}, Day ${snapshot.data!.day}', style: Theme.of(context).textTheme.bodyLarge),
+                SizedBox(height: 20),
+                Text(snapshot.data!.content, style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
