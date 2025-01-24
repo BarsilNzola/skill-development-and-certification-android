@@ -9,21 +9,19 @@ class LessonDetailScreen extends StatefulWidget {
 
 class _LessonDetailScreenState extends State<LessonDetailScreen> {
   late Future<Lesson> _lesson;
-  final ApiService _apiService = ApiService(baseUrl: 'http://localhost:8000/api');  // Adjust baseUrl to your backend URL
+  final ApiService _apiService = ApiService(baseUrl: 'http://localhost:8000/');
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final lessonId = ModalRoute.of(context)!.settings.arguments as int;
-    _lesson = _apiService.fetchLessonDetail(lessonId);  // Update your API service accordingly
+    _lesson = _apiService.fetchLessonDetail(lessonId);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Lesson Detail'),
-      ),
+      appBar: AppBar(title: Text('Lesson Detail')),
       body: FutureBuilder<Lesson>(
         future: _lesson,
         builder: (context, snapshot) {

@@ -15,7 +15,7 @@ class ApiService {
 
   ApiService({required this.baseUrl});
 
-
+  // Login
   Future<User> login(String username, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/login/'),
@@ -30,11 +30,18 @@ class ApiService {
     }
   }
 
-  Future<User> signup(String username, String email, String password) async {
+  // Signup
+  Future<User> signup(
+      String username, String email, String password, String confirmPassword) async {
     final response = await http.post(
       Uri.parse('$baseUrl/signup/'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'username': username, 'email': email, 'password': password}),
+      body: jsonEncode({
+        'username': username,
+        'email': email,
+        'password': password,
+        'confirm_password': confirmPassword,
+      }),
     );
 
     if (response.statusCode == 201) {
@@ -44,6 +51,7 @@ class ApiService {
     }
   }
 
+  // Fetch Courses
   Future<List<Course>> fetchCourses() async {
     final response = await http.get(Uri.parse('$baseUrl/courses/'));
 
@@ -55,6 +63,7 @@ class ApiService {
     }
   }
 
+  // Fetch Modules
   Future<List<Module>> fetchModules() async {
     final response = await http.get(Uri.parse('$baseUrl/modules/'));
 
@@ -65,31 +74,10 @@ class ApiService {
       throw Exception('Failed to load modules');
     }
   }
-    
-  Future<List<Module>> fetchUserModules(int userId) async {
-    final response = await http.get(Uri.parse('$baseUrl/users/$userId/modules/'));
 
-    if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(response.body);
-      return body.map((dynamic item) => Module.fromJson(item)).toList();
-    } else {
-      throw Exception('Failed to load user modules');
-    }
-  }
-
-  Future<List<Lesson>> fetchLessons() async {
-    final response = await http.get(Uri.parse('$baseUrl/lessons/'));
-
-    if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(response.body);
-      return body.map((dynamic item) => Lesson.fromJson(item)).toList();
-    } else {
-      throw Exception('Failed to load lessons');
-    }
-  }
-
+  // Fetch Lessons for a Module
   Future<List<Lesson>> fetchLessonsForModule(int moduleId) async {
-    final response = await http.get(Uri.parse('$baseUrl/modules/$moduleId/lessons/'));
+    final response = await http.get(Uri.parse('$baseUrl/module/$moduleId/lessons/'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
@@ -99,8 +87,9 @@ class ApiService {
     }
   }
 
+  // Fetch Lesson Detail
   Future<Lesson> fetchLessonDetail(int lessonId) async {
-    final response = await http.get(Uri.parse('$baseUrl/lessons/$lessonId/'));
+    final response = await http.get(Uri.parse('$baseUrl/lesson/$lessonId/'));
 
     if (response.statusCode == 200) {
       return Lesson.fromJson(jsonDecode(response.body));
@@ -109,8 +98,9 @@ class ApiService {
     }
   }
 
+  // Fetch Progress
   Future<List<Progress>> fetchProgresses() async {
-    final response = await http.get(Uri.parse('$baseUrl/progresses/'));
+    final response = await http.get(Uri.parse('$baseUrl/progress/'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
@@ -120,6 +110,7 @@ class ApiService {
     }
   }
 
+  // Fetch Quizzes
   Future<List<Quiz>> fetchQuizzes() async {
     final response = await http.get(Uri.parse('$baseUrl/quizzes/'));
 
@@ -131,6 +122,7 @@ class ApiService {
     }
   }
 
+  // Fetch Questions
   Future<List<Question>> fetchQuestions() async {
     final response = await http.get(Uri.parse('$baseUrl/questions/'));
 
@@ -142,6 +134,7 @@ class ApiService {
     }
   }
 
+  // Fetch Assignments
   Future<List<Assignment>> fetchAssignments() async {
     final response = await http.get(Uri.parse('$baseUrl/assignments/'));
 
@@ -153,8 +146,9 @@ class ApiService {
     }
   }
 
-  Future<List<Certificate>> fetchCertificates() async {
-    final response = await http.get(Uri.parse('$baseUrl/certificates/'));
+  // Fetch Certificates
+  Future<List<Certificate>> fetchCertificates(int courseId, int userId) async {
+    final response = await http.get(Uri.parse('$baseUrl/certificate/$courseId/$userId/'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);

@@ -10,82 +10,67 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   late Future<List<Module>> _modules;
-  final ApiService _apiService = ApiService(baseUrl: 'http://localhost:8000/api');  // Adjust baseUrl to your backend URL
+  final ApiService _apiService = ApiService(baseUrl: 'http://localhost:8000/');
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Retrieve user from the navigation arguments
     final User user = ModalRoute.of(context)!.settings.arguments as User;
-    _modules = _apiService.fetchUserModules(user.id);  // Fetch user-specific modules
+
+    // Fetch modules (no user ID required in the updated service)
+    _modules = _apiService.fetchModules();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dashboard'),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text(
-                'Code Gears',
-                style: TextStyle(color: Colors.white, fontSize: 25),
-              ),
-              decoration: BoxDecoration(
-                color: Color(0xFF004466),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
-              onTap: () {
-                Navigator.pushNamed(context, '/');
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.login),
-              title: Text('Login / Sign Up'),
-              onTap: () {
-                Navigator.pushNamed(context, '/login');
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.dashboard),
-              title: Text('Dashboard'),
-              onTap: () {
-                Navigator.pushNamed(context, '/dashboard');
-              },
-            ),
-          ],
-        ),
+        title: const Text('Dashboard'),
+        centerTitle: true,
       ),
       body: FutureBuilder<List<Module>>(
         future: _modules,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No modules available'));
+            return const Center(child: Text('No modules available'));
           }
 
-          return ListView(
-            children: snapshot.data!.map((module) {
+          // Render list of modules
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              final module = snapshot.data![index];
               return Card(
+                elevation: 4,
+                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: ListTile(
-                  leading: Image.network(module.imageUrl),  // Ensure your API provides the full URL for images
-                  title: Text(module.title),
+                  leading: Image.network(
+                    module.imageUrl,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                  title: Text(
+                    module.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text(module.description),
                   onTap: () {
-                    Navigator.pushNamed(context, '/module_lessons', arguments: module.id);
+                    // Navigate to module lessons screen
+                    Navigator.pushNamed(
+                      context,
+                      '/module_lessons',
+                      arguments: module.id,
+                    );
                   },
                 ),
               );
-            }).toList(),
+            },
           );
         },
       ),
